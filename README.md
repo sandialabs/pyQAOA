@@ -11,7 +11,7 @@ for use in gradient-based numerical optimization schemes.
 In general, we are interested in finding a collection of control angles that will minimize
 an objective function (expectation value)
 
-![Objective Function]{/doc/equations/objective.pdf}
+![Objective Function](/doc/equations/objective.pdf)
 
 
 # Requirements
