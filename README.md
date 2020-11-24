@@ -8,11 +8,6 @@ rapid evaluation of the objective function. Adjoint methods and sensitivity equa
 further provide access to objective gradients and Hessians or Hessian-vector products 
 for use in gradient-based numerical optimization schemes. 
 
-In general, we are interested in finding a collection of control angles that will minimize
-an objective function (expectation value)
-
-<img src="https://github.com/gregvw/pyQAOA/tree/master/doc/equations/objective.png" width="200" title="objective function">
-
 # Requirements
 * Python 3
 * NumPy
