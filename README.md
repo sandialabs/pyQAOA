@@ -11,7 +11,7 @@ for use in gradient-based numerical optimization schemes.
 In general, we are interested in finding a collection of control angles that will minimize
 an objective function (expectation value)
 
-<img src=https://github.com/gregvw/pyQAOA/doc/equations/objective.png" width="200" title="objective function">
+<img src="https://github.com/gregvw/pyQAOA/doc/equations/objective.png" width="200" title="objective function">
 
 # Requirements
 * Python 3
