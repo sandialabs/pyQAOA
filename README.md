@@ -15,4 +15,9 @@ for use in gradient-based numerical optimization schemes.
 * NetworkX
 * SciPy
 
+##### [LICENSE](https://github.com/gregvw/pyQAOA/blob/master/LICENSE)
 
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+
+Under the terms of Contract DE-NA0003525 with NTESS,
+the U.S. Government retains certain rights in this software.
