@@ -1,12 +1,12 @@
 import numpy as np
-from qaoa.operators import Kronecker, SumSigmaXOperator, Propagator
+from qaoa.operators import Kronecker, SumSigmaYOperator, Propagator
 
 class SumSigmaYPropagator(Propagator):
 
     def __init__(self,D,theta=0):
-        assert( isinstamce(D,SumSigmaYOperator) )
+        assert( isinstance(D,SumSigmaYOperator) )
         self.kronecker = Kronecker(np.eye(2,dtype=float),D.num_qubits(),dtype=complex)
-        super.__init__(D,theta)
+        super().__init__(D,theta)
 
     def __str__(self):
         return "SumSigmaYPropagator"

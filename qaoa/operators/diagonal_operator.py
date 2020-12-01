@@ -12,6 +12,10 @@ class DiagonalOperator(HermitianOperator):
     def __str__(self):
         return "DiagonalOperator"
 
+    def true_maximum(self):
+        import numpy
+        return numpy.max(self.data)
+
     def true_minimum(self):
         import numpy
         return numpy.min(self.data)

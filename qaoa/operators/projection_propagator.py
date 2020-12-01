@@ -9,6 +9,7 @@ class ProjectionPropagator(Propagator):
         
         assert( isinstance(P,ProjectionOperator) )
         super().__init__(P,theta)
+        self.alpha = np.exp(1j*self.theta)
 
     def set_control(self,theta):
         self.theta = theta

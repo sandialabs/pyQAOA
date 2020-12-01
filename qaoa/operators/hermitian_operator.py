@@ -14,6 +14,9 @@ class HermitianOperator(LinearOperator):
     def true_minimum(self):
         raise NotImplementedError("Derived type does not implement true_minimum() method")
 
+    def true_maximum(self):
+        raise NotImplementedError("Derived type does not implement true_maximum() method")
+
     def inner_product(self,u,v):
         self.apply(v,self.work[:])
         return inner_product(u,self.work)

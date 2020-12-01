@@ -1,14 +1,18 @@
 from qaoa.operators import HermitianOperator
 from qaoa.util.math import projection_1d
+import numpy as np
 
 class ProjectionOperator(HermitianOperator):
 
-    def __init__(self,v):
-        import numpy as np
-        self.v = v
-        nq = int(numpy.log2(len(v)))
+    def __init__(self,v=None,nq=None):
+        self.v = v if v is not None else np.ones(1<<nq)/np.sqrt(1<<nq)
+        nq = int(np.log2(len(self.v)))
         super().__init__(nq)
- 
+    
+    def propagator(self,theta=0):
+        from qaoa.operators import ProjectionPropagator
+        return ProjectionPropagator(self,theta)
+
     def as_matrix(self):
         return np.outer(self.conj(v),v)
        

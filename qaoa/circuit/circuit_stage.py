@@ -63,6 +63,14 @@ class CircuitStage(object):
     def get_stage_number(self):
         return 1+self.prev.get_stage_number() if self.prev is not None else 0
 
+    @staticmethod
+    def link(s1,s2,*rest):
+        assert(s1.num_qubits() == s2.num_qubits())
+        s1.next = s2
+        s2.prev = s1
+        if len(rest):
+            CircuitStage.link(s2,*srest)
+
 def link_stages(s1,s2,*srest):
     assert(s1.nq == s2.nq)
     s1.next = s2
