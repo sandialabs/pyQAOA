@@ -30,11 +30,13 @@ class UnitaryStage(CircuitStage):
             self.theta = theta
             self.U.set_control(self.theta)
             self.notify_compute_psi()
+            self.notify_compute_lam()
 
     def set_differential_control(self,dtheta):
         if dtheta != self.dtheta:
             self.dtheta = dtheta
             self.notify_compute_dpsi()
+            self.notify_compute_dlam()
 
     def psi(self):
         if self.need_compute_psi:

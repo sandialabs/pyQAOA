@@ -31,8 +31,8 @@ class QuantumCircuit(object):
         #  
         # 1 vector for psi0
         # 1 vector to be shared by Propagators
-        # 4 vectors per UnitaryStage 
-        # 2 vectors for TargetStage
+        # 4 vectors per UnitaryStage (psi,lam,dpsi,dlam)
+        # 2 vectors for TargetStage (lam,dlam)
 
         N = 1 << self.num_qubits
         L = 4*self.num_stages
@@ -47,7 +47,7 @@ class QuantumCircuit(object):
         self.psi  = self.work[:,0:L:4]
         self.lam  = self.work[:,1:L+1:4]
         self.dpsi = self.work[:,2:L+2:4]
-        self.dlam = self.work[:,3:L+4:4]
+        self.dlam = self.work[:,3:L+3:4]
 
         self.stage = [InitialStage(psi0=self.psi0)]
 
@@ -63,6 +63,12 @@ class QuantumCircuit(object):
         Return the true minimum expectation value of this circuit's target operator if possible
         """
         return self.A[-1].true_minimum()
+
+    def true_maximum(self):
+        """
+        Return the true maximum expectation value of this circuit's target operator if possible
+        """
+        return self.A[-1].true_maximum()
 
     def set_control(self,theta):
         """
@@ -147,7 +153,7 @@ class QuantumCircuit(object):
             for h in delta:
                 error.append(np.linalg.norm(Hv-(self.gradient(theta+h*v)-g0)/h))
         else:
-            error = np.linalg.norm(Hv-(self.gradient(theta+h*v)-g0)/h)
+            error = np.linalg.norm(Hv-(self.gradient(theta+delta*v)-g0)/delta)
 
         return np.array(error) if isinstance(error,list) else error
 
@@ -185,6 +191,34 @@ class QuantumCircuit(object):
            self.set_control(theta+delta*v)
            self.stage[-2].psi()
            error = np.max(np.abs(self.dpsi-(self.psi-psi_0)/delta))
+ 
+        self.set_control(theta)
+        return np.array(error) if isinstance(error,list) else error
+
+    def check_dlam(self,theta,delta=1e-4,v=None):
+        """
+        Compute the error of the adjoint sensitivity using a first-order 
+        finite difference approximation
+        """
+
+        if v is None:
+            v = np.random.rand(self.num_stages) * np.pi
+
+        self.set_control(theta)
+        self.set_differential_control(v)
+        self.stage[1].lam()
+        self.stage[1].dlam()
+        lam_0 = np.copy(self.lam)
+        if hasattr(delta,"__iter__"):
+            error = list()
+            for h in delta:
+                self.set_control(theta+h*v)
+                self.stage[1].lam()
+                error.append(np.max(np.abs(self.dlam-(self.lam-lam_0)/h)))
+        else:
+           self.set_control(theta+delta*v)
+           self.stage[1].lam()
+           error = np.max(np.abs(self.dlam-(self.lam-lam_0)/delta))
  
         self.set_control(theta)
         return np.array(error) if isinstance(error,list) else error
