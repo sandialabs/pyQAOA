@@ -1,3 +1,4 @@
+from .linear_operator import OperatorDocumentation
 from .linear_operator import LinearOperator
 from .linear_operator import test
 from .hermitian_operator import HermitianOperator

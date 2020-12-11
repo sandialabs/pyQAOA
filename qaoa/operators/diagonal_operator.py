@@ -1,11 +1,19 @@
 from qaoa.operators import HermitianOperator
-from qaoa.util.math import hadamard_mult, hadamard_div, hadamard_conj_mult, hadamard_conj_div
+from qaoa.util.math import hadamard_mult, hadamard_div, hadamard_conj_mult, hadamard_conj_div, \
+                           diag_inner_product, diag_conj_inner_product
 
 class DiagonalOperator(HermitianOperator):
+    """
+    Implements a Hermitian operator that can be represented as a diagonal matrix
+    """
 
     def __init__(self,d):
+
         import numpy
+
         assert(isinstance(d,numpy.ndarray) and len(d.shape)==1)
+        assert(numpy.isreal(d.dtype))
+
         self.data = d
         super().__init__(int(numpy.log2(len(d))))
  
@@ -20,11 +28,13 @@ class DiagonalOperator(HermitianOperator):
         import numpy
         return numpy.min(self.data)
 
+    def inner_product(self,u,v):
+        return diag_inner_product(u,self.data,v)
+
+    def conj_inner_product(self,u,v):
+        return diag_conj_inner_product(u,self.data,v)
+
     def as_matrix(self):
-        """
-        Returns a 2D NumPy array form of this operator. NOTE: This method should be used for 
-        verification purposes only as it is computationally expensive.
-        """
         import numpy 
         return numpy.diag(self.data)
        

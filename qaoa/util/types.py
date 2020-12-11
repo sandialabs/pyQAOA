@@ -18,6 +18,17 @@ def is_callable(x):
 def is_container(x):
     return hasattr(x,"__getitem__")
 
+def complex_type(rtype):
+    return type(1j*rtype())
+
+def real_type(ctype):
+    return type(numpy.real(ctype()))
+
+def is_float(x):
+    xtype = type(x)
+    return numbers.Real.__subclasscheck__(xtype) and not \
+           numbers.Integral.__subclasscheck__(xtype)
+
 def is_integer(x):
     return isinstance(x,numbers.Integral)
 
@@ -35,13 +46,3 @@ def is_rowvalue(x):
 
 def is_rowcolvalue(x):
     return all( is_integer(y[0]) for y in x ) if is_container(x) and len(x[0])==3 else False
- 
-# Operator Types
-
-def is_LinearOperator(x):
-    return isinstance(x,qaoa.operators.LinearOperator)        
-
-def is_DiagonalOperator(x):
-    return isinstance(x,qaoa.operators.DiagonalOperator)        
-
-

@@ -35,9 +35,9 @@ def plot_landscape(obj,ax,ni=20,ne=100):
     ax.set_ylabel(r'$\gamma$',fontsize=12)
     ax.set_yticks(ticks)
     ax.set_yticklabels(labels,fontsize=12)
+
     ax.clabel(C,levels,inline=1,fontsize=10,fmt="%d")
     ax.set_aspect('equal','box')
-
     ax.grid(True,linestyle='--')
 
 

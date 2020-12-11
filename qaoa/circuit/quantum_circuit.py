@@ -58,6 +58,9 @@ class QuantumCircuit(object):
         self.stage.append(TargetStage(self.A[-1]))#,lam=self.work[:,-2],dlam=self.work[:,-3]))
         link_stages(*self.stage)
 
+    def __len__(self):
+        return self.num_stages
+
     def true_minimum(self):
         """
         Return the true minimum expectation value of this circuit's target operator if possible

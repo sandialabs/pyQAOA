@@ -1,5 +1,5 @@
 from qaoa.operators import HermitianOperator
-from qaoa.util.math import projection_1d
+from qaoa.util.math import projection_1d, inner_product, conj_inner_product
 import numpy as np
 
 class ProjectionOperator(HermitianOperator):
@@ -8,6 +8,12 @@ class ProjectionOperator(HermitianOperator):
         self.v = v if v is not None else np.ones(1<<nq)/np.sqrt(1<<nq)
         nq = int(np.log2(len(self.v)))
         super().__init__(nq)
+
+    def inner_product(self,x,y):
+        return inner_product(x,self.v) * inner_product(self.v,y)
+
+    def conj_inner_product(self,x,y):
+        return conj_inner_product(x,self.v) * conj_inner_product(self.v,y)
     
     def propagator(self,theta=0):
         from qaoa.operators import ProjectionPropagator

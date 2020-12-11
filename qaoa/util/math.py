@@ -38,6 +38,21 @@ def conj_inner_product(u,v):
     return result
 
 @njit(parallel=True)
+def diag_inner_product(u,d,v):
+    result = 0
+    for k in prange(len(d)):
+        result += u[k] * d[k] * v[k]
+    return result
+
+@njit(parallel=True)
+def diag_conj_inner_product(u,d,v):
+    result = 0
+    for k in prange(len(u)):
+        result += np.conj(u[k]) * d[k] * v[k]
+    return result
+
+
+@njit(parallel=True)
 def hadamard_mult(d,v,Dv):
     for j in prange(len(d)):
         Dv[j] = d[j]*v[j]
@@ -67,21 +82,6 @@ def cexp_hadamard_div(d,theta,v,Uv):
     for k in prange(len(d)):
         Uv[k] = np.exp(-1j*theta*d[k])*v[k]
 
-@njit(parallel=True)
-def sum_sigma_x_mult(n,v,Dv):
-    for j in prange(1<<n):
-        Dv[j] = 0
-        for k in prange(n):
-            Dv[j] += v[j^(1<<k)]
-
-@njit(parallel=True)
-def sum_sigma_y_mult(n,v,Dv):
-    for j in prange(1<<n):
-        Dv[j] = 0
-        for l in prange(n):
-            k = j ^ (1<<l)
-            s = 1j if j>k else -1j
-            Dv[j] += s*v[k]
 
 @njit(parallel=True)
 def projection_1d(v,x,y):
