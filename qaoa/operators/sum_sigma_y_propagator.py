@@ -20,5 +20,6 @@ class SumSigmaYPropagator(Propagator):
     def apply(self,v,u):
         self.kronecker.apply(v,u)
 
-
+    def as_matrix(self):
+        return self.kronecker.as_matrix()
 

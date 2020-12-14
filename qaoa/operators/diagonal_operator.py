@@ -1,6 +1,21 @@
 from qaoa.operators import HermitianOperator
-from qaoa.util.math import hadamard_mult, hadamard_div, hadamard_conj_mult, hadamard_conj_div, \
-                           diag_inner_product, diag_conj_inner_product
+from qaoa.util.math import hadamard_mult, hadamard_div, hadamard_conj_mult, hadamard_conj_div
+from numba import njit, prange
+
+@njit(parallel=True)
+def diag_inner_product(u,d,v):
+    result = 0
+    for k in prange(len(d)):
+        result += u[k] * d[k] * v[k]
+    return result
+
+@njit(parallel=True)
+def diag_conj_inner_product(u,d,v):
+    result = 0
+    for k in prange(len(u)):
+        result += np.conj(u[k]) * d[k] * v[k]
+    return result
+
 
 class DiagonalOperator(HermitianOperator):
     """
@@ -15,7 +30,10 @@ class DiagonalOperator(HermitianOperator):
         assert(numpy.isreal(d.dtype))
 
         self.data = d
-        super().__init__(int(numpy.log2(len(d))))
+        self.length = len(d)
+        self.nq = int(numpy.log2(self.length))
+        self.dtype = d.dtype
+#        super().__init__(int(numpy.log2(len(d))),dtype=d.dtype)
  
     def __str__(self):
         return "DiagonalOperator"
@@ -27,6 +45,10 @@ class DiagonalOperator(HermitianOperator):
     def true_minimum(self):
         import numpy
         return numpy.min(self.data)
+
+    def propagator(self,theta=0):
+        from qaoa.operators import DiagonalPropagator
+        return DiagonalPropagator(self,theta)
 
     def inner_product(self,u,v):
         return diag_inner_product(u,self.data,v)

@@ -8,7 +8,7 @@ def test_IsingHamiltonian():
     h = np.random.randn(nq)
     G = nx.random_regular_graph(3,nq)
     C = qaoa.operators.IsingHamiltonian(graph=G)
-    Uc = qaoa.operators.generate_propagator(C)
+    Uc = C.propagator()
 
     v = np.random.randn(1<<nq) + 1j * np.random.randn(1<<nq)
     u = np.zeros(1<<nq,dtype=complex)

@@ -20,14 +20,14 @@ class HermitianOperator(LinearOperator):
         Return the minimum eigenvalue of the Hermitian operator
         
         """
-        raise NotImplementedError("{0} does not override true_minimum() method".format(str(self))
+        raise NotImplementedError("{0} does not override true_minimum() method".format(str(self)))
 
     @abc.abstractmethod
     def true_maximum(self):
         """
         Return the maximum eigenvalue of the Hermitian operator
         """        
-        raise NotImplementedError("{0} does not override true_maximum() method".format(str(self))
+        raise NotImplementedError("{0} does not override true_maximum() method".format(str(self)))
 
     @abc.abstractmethod
     def inner_product(self,u,v):
@@ -51,7 +51,7 @@ class HermitianOperator(LinearOperator):
         
         Returns
         -------
-        value : HermitianOperator.dtype
+        value : LinearOperator.dtype
             numpy.dot(numpy.conj(),Av) 
         """
         return np.real(self.conj_inner_product(v,v))
@@ -63,12 +63,12 @@ class HermitianOperator(LinearOperator):
 
         Creates a new object of the form U = exp(i*theta*A), where A is the current operator
         """
-        from qaoa.operators import Propagator
-        return Propagator.create(self,theta)
-
+        raise NotImplementedError("{0} foes not override method propagator()".format(str(self)))
 
     def apply_adjoint(self,v,Hv):
         self.apply(v,Hv)
 
     def apply_adjoint_inverse(self,v,Hv):
         self.apply_inverse(v,Hv)
+
+

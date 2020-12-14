@@ -17,6 +17,8 @@ class LinearOperator(object,metaclass=OperatorDocumentation):
     """
     Defines the interface of generic linear operators that can be applied to vectors
 
+    The current design assumes that the matrix representation of linear operators is square
+
     Attributes
     ----------
     
@@ -24,10 +26,11 @@ class LinearOperator(object,metaclass=OperatorDocumentation):
         The number of qubits this operator is defined for
     length : unsigned int
         The size of the domain and range spaces of this operator (2**nq)
-
+    dtype : type
+        Data type associated with the operator
     """
 
-    def __init__(self,nq):
+    def __init__(self,nq,dtype=float):
         """
         Constructor for an abstract (square) linear operator. 
 
@@ -37,6 +40,8 @@ class LinearOperator(object,metaclass=OperatorDocumentation):
         ----------
         nq : unsigned int  
             The number of qubits on which to define this operator
+        dtype : type (optional)
+            Data type associated with the operator. Set to float if not provided
         """
  
         self.nq = nq
@@ -136,6 +141,36 @@ class LinearOperator(object,metaclass=OperatorDocumentation):
         raise NotImplementedError("Derived class does not override as_matrix() method")
 
     @abc.abstractmethod
+    def check_apply(self,v=None,tol=1e-8):
+        """
+        Compare the action of the apply method against matrix multiplication 
+
+        Parameters
+        ----------
+        v : numpy.ndarray (optional)
+            Domain vector on which to check the apply method. If not supplied, a 
+
+        Returns
+        -------
+        result : bool
+            Check passes if norm(Av-A@v) < tol * norm(v), where Av is the range vector 
+        produced by apply(v,Av) and A is the matrix returned by the method as_matrix()
+                
+        """
+
+        import numpy as np
+        
+        if v is None:
+            v = np.random.randn(self.length)
+        Av = np.ndarray(self.length,dtype=v.dtype)
+        self.apply(v,Av)
+        res = self.as_matrix() @ v - Av
+        rnorm = np.linalg.norm(res)
+        vnorm = np.linalg.norm(v)
+        return rnorm < tol * vnorm
+
+
+    @abc.abstractmethod
     def num_qubits(self):
         """
         Number of qubits for which this operator is defined
@@ -148,85 +183,3 @@ class LinearOperator(object,metaclass=OperatorDocumentation):
         """
         return self.nq
 
-    @abc.abstractmethod
-    def test(self,method,A,v,Av):
-        """
-        Perform tests on this operator
-        """
-        assert( is_squarematrix(A) or is_callable(A) )
-
-        import numpy
-        dtype = type(v[0])
-        eps = numpy.finfo(dtype).eps
-        tol = numpy.sqrt(len(v))
-        u = A.dot(v) if is_squarematrix(A) else A(v)
-        method(v,Av)
-        error = numpy.linalg.norm(Av-u)
-        return error, tol        
-
-    @abc.abstractmethod
-    def test_apply(self,A,v,Av):
-        """
-        Perform tests on this operator
-        """
-        return self.test(self.apply,A,v,Av)
-
-
-def test(op_type,cargs,exact,**kwargs):
-
-    import numpy
-
-    assert( isinstance(op_type,str) )
-    assert( isinstance(cargs,str) )
-
-    exec("from qaoa.operators import {0}".format(op_type),locals())
-    get = lambda key, default : kwargs[key] if key in kwargs.keys() else default
-         
-    nqmin = get("nqmin",2)
-    nqmax = get("nqmax",8)
-    nqstep = get("nqstep",1)
-    nqrange = get("nqrange",[nq for nq in range(nqmin,nqmax+1,nqstep)])
-    rv = get("rv","numpy.zeros(1<<nq)")
-    dv = get("dv","numpy.random.randn(1<<nq)")
-    method = get("Method","apply")
-    exprs  = get("exprs",list())
-    exact = exact.replace("np","numpy")
-    w1 = get("w1",16)
-    w2 = get("w2",16)
-
-    row = "{:" + str(w1) + "} | {:<" + str(w2) + "}"
-    printrow = lambda x,y : print(row.format(x,y))
-
-    exprs = [expr.replace("np","numpy") for expr in exprs]
-
-    tolerance = dict()
-    apply_error = dict()
-    printrow("\n\nNumber of Qubits","Error")
-    print("-"*w1 + "-+-" + "-"*w2)
-    
-    for nq in nqrange:
-
-        setnq = lambda s : s.replace("nq",str(nq)).replace("np","numpy")
-        init = setnq(cargs)
-         
-        for expr in exprs:
-           exec(setnq(expr),locals())
-
-        # Domain vector
-        v = eval(setnq(dv),locals())
-
-        # Range vector
-        u = eval(setnq(dv),locals())
-
-        construct = "{0}({1})".format(op_type,init)      
-        A = eval(construct,locals())
-
-        # Test apply()
-        cmd = "A.test_{0}({1},v,u)".format(method,exact)
-        error,tol = eval(cmd,locals())
-
-        printrow(nq,error)
-        tolerance[nq] = tol
-        apply_error[nq] = error
-
-    assert( all(apply_error[nq]<tol for nq,tol in tolerance.items()) )

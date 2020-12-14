@@ -48,3 +48,6 @@ class Kronecker(LinearOperator):
         f = lambda k,x,y : apply_kron2(np.conj(Ki.T),self.nq,k,x,y)
         self.compute(f,v,u)
 
+    def as_matrix(self):
+        otimes = lambda A0,*A : np.kron(A0,otimes(*A)) if len(A) else A0
+        return otimes(*([self.K]*self.nq))

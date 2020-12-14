@@ -38,21 +38,6 @@ def conj_inner_product(u,v):
     return result
 
 @njit(parallel=True)
-def diag_inner_product(u,d,v):
-    result = 0
-    for k in prange(len(d)):
-        result += u[k] * d[k] * v[k]
-    return result
-
-@njit(parallel=True)
-def diag_conj_inner_product(u,d,v):
-    result = 0
-    for k in prange(len(u)):
-        result += np.conj(u[k]) * d[k] * v[k]
-    return result
-
-
-@njit(parallel=True)
 def hadamard_mult(d,v,Dv):
     for j in prange(len(d)):
         Dv[j] = d[j]*v[j]

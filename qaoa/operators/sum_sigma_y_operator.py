@@ -44,6 +44,10 @@ class SumSigmaYOperator(HermitianOperator):
     def __str__(self):
         return "SumSigmaYOperator"
 
+    def propagator(self,theta=0):
+        from qaoa.operators import SumSigmaYPropagator
+        return SumSigmaYPropagator(self,theta)
+
     def as_matrix(self):
         import numpy as np
         otimes = lambda A0,*A: np.kron(A0,otimes(*A)) if len(A) else A0

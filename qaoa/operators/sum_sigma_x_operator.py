@@ -43,6 +43,10 @@ class SumSigmaXOperator(HermitianOperator):
     def conj_inner_product(self,u,v):
         return sum_sigma_x_conj_inner_product(self.nq,u,v)
 
+    def propagator(self,theta=0):
+        from qaoa.operators import SumSigmaXPropagator
+        return SumSigmaXPropagator(self,theta)
+
     def as_matrix(self):
         import numpy as np
         otimes = lambda A0,*A: np.kron(A0,otimes(*A)) if len(A) else A0

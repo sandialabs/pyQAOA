@@ -4,13 +4,14 @@ class Propagator(UnitaryOperator):
 
     def __init__(self,A,theta=0):
         self.A = A
-        self.theta = theta
- 
+        self.theta = self.A.dtype.type(theta)
+        super().__init__(A.nq)
+
     def __str__(self):
         return "Propagator"
 
     def set_control(self,theta):
-        self.theta = theta
+        self.theta = self.A.dtype.type(theta)
 
     def get_operator(self):
         return self.A

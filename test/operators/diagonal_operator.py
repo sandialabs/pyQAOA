@@ -1,17 +1,17 @@
 import qaoa
 import numpy as np
 
-def test_DiagonalOperator_apply():
-    exprs = ["d = np.random.randn(1<<nq)",]
-    qaoa.operators.test(op_type="DiagonalOperator",cargs="d",exact="lambda v:d*v",exprs=exprs)
 
-def test_DiagonalOperator_apply_adjoint():
-    exprs = ["d = np.random.randn(1<<nq)",]
-    qaoa.operators.test(op_type="DiagonalOperator",cargs="d",exact="lambda v:d*v",method="apply_adjoint",exprs=exprs)
+def check_DiagonalOperator_apply(num_qubits,tol):
+    m = 1 << num_qubits
+    d = np.random.rand(m) 
+    v = np.random.randn(m)
+    D = qaoa.operators.DiagonalOperator(d)
+    assert( D.check_apply(v,tol) )
 
+def test_DiagonalOperator():
+    check_DiagonalOperator_apply(8,1e-8)
 
 if __name__ == '__main__':
-
-    test_DiagonalOperator_apply()
-    test_DiagonalOperator_apply_adjoint()
+    test_DiagonalOperator()
 
