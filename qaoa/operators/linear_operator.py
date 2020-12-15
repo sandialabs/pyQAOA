@@ -47,7 +47,14 @@ class LinearOperator(object,metaclass=OperatorDocumentation):
         self.nq = nq
         self.length = 1 << nq 
   
+    @abc.abstractmethod
     def __str__(self):
+        """
+        Returns
+        -------
+        name : string
+            The name of the class
+        """
         return "LinearOperator"
    
     @abc.abstractmethod
@@ -73,6 +80,8 @@ class LinearOperator(object,metaclass=OperatorDocumentation):
             Domain vector of length 2**nq
         Av : numpy.ndarray 
             Range vector of length 2**nq. Modified in-place
+
+           
 
         """
         raise NotImplementedError("Derived class does not override apply() method")
@@ -127,6 +136,15 @@ class LinearOperator(object,metaclass=OperatorDocumentation):
         """
         Return a 2D NumPy array of the operator in matrix form. 
 
+        Let A be an instance of a derived type that overrides this method. Then A.as_matrix()
+        should return a 2D NumPy array that contains the same elemental values as would be 
+        produced by the code
+
+        >>> n = len(A)
+        >>> I = np.eye(n)
+        >>> M = numpy.zeros((n,n))
+        >>> [ A.apply(e,M[:,k]) for k,e in enumerate(I) ] 
+
         Note
         ----
         This method is for testing and validation purposes only as the cost of forming the operator
@@ -136,7 +154,7 @@ class LinearOperator(object,metaclass=OperatorDocumentation):
         -------
         M : numpy.ndarray
             Matrix of shape (2**nq,2**nq) that would be obtained by applying this operator to the 
-        identity matrix.
+            identity matrix.
         """
         raise NotImplementedError("Derived class does not override as_matrix() method")
 
@@ -154,7 +172,7 @@ class LinearOperator(object,metaclass=OperatorDocumentation):
         -------
         result : bool
             Check passes if norm(Av-A@v) < tol * norm(v), where Av is the range vector 
-        produced by apply(v,Av) and A is the matrix returned by the method as_matrix()
+            produced by apply(v,Av) and A is the matrix returned by the method as_matrix()
                 
         """
 

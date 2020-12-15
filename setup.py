@@ -6,5 +6,5 @@ setup( name = 'QAOA',
        author = 'Greg von Winckel',
        packages = find_packages(),
        package_data={'qaoa' :['data/*.json']},
-       requires = ['networkx', 'numba', 'numpy','scipy']
+       requires = ['networkx','numba','numpy','scipy','sphinx','sphinx_rtd_theme']
      )

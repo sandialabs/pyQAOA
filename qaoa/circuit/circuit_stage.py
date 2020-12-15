@@ -2,6 +2,11 @@ import qaoa
 
 class CircuitStage(object):
 
+    """
+    Interface class for a stage in a quantum circuit
+
+    """
+
     def __init__(self,nq):
         self.nq = nq
         self.prev = None

@@ -112,16 +112,16 @@ def zspin(n,k,i):
 def ising_dense_h(h_v,c):
     N = len(c)
     n = len(h_v)
-    for k in range(N):
+    for k in prange(N):
         for i,h in enumerate(h_v):
             c[k] += h * zspin(n,k,i)
 
-@njit(parallel=True)
+#@njit(parallel=True)
 def ising_sparse_h(h_rv,c):
     N = len(c)
     n = int(np.log2(N))
     p = len(h_rv)
-    for k in prange(N):
+    for k in range(N):
         for i, h in h_rv:
             c[k] += h * zspin(n,k,i)
 

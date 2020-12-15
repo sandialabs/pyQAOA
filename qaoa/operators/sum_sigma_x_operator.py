@@ -32,6 +32,14 @@ def sum_sigma_x_conj_inner_product(n,u,v):
 class SumSigmaXOperator(HermitianOperator):
 
     def __init__(self,nq):
+        """
+        Create a SumSigmaXOperator for nq qubits
+        
+        Parameters
+        ----------
+        nq : unsigned int
+            Number of qubits
+        """
         super().__init__(nq)
 
     def __str__(self):

@@ -26,7 +26,7 @@ class DiagonalOperator(HermitianOperator):
 
         import numpy
 
-        assert(isinstance(d,numpy.ndarray) and len(d.shape)==1)
+        assert(isinstance(d,numpy.ndarray) and d.ndim==1)
         assert(numpy.isreal(d.dtype))
 
         self.data = d

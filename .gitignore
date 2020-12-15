@@ -13,3 +13,10 @@ __pycache__
 # VIM temporary save files
 *.swp
 *.swo
+
+# Sphinx files
+.DS_Store
+Makefile
+/doc/build
+/doc/make.bat
+
