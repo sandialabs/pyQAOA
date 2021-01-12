@@ -14,7 +14,6 @@ for an n-qubit system where the multi-qubit spin operators are defined as
    I_{[k]} &\in \mathbb{R}^{k\times k},\quad [I_{[k]}]_{ij} = \delta_{ij}
 
 
-
 .. autoclass:: qaoa.operators.IsingHamiltonian
 
 

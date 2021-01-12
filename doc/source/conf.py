@@ -30,15 +30,17 @@ release = '0.1'
 autodoc_default_options = {
   'members' : True,
   'member-order' : 'bysource',
-  'special-members' : '__init__',
-  'special-members' : '__str__',
   'undoc-members' : True}
  
+autoclass_content = 'both'
+
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autodoc',
-              'sphinx.ext.napoleon']
+              'sphinx.ext.napoleon',
+              'sphinx.ext.mathjax'
+             ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -50,6 +52,19 @@ master_doc = 'index'
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
+
+import re
+mathjax_config = {'TeX':{'Macros':{}}} # Create empty 
+
+with open('newcommands.tex', 'r') as f:
+    for line in f:
+        macros = re.findall(r'\\newcommand{\\(.*?)}(\[(\d)\])?{(.+)}', line)
+        for macro in macros:
+            if len(macro[1]) == 0:
+                mathjax_config['TeX']['Macros'][macro[0]] = "{"+macro[3]+"}"
+            else:
+                mathjax_config['TeX']['Macros'][macro[0]] = ["{"+macro[3]+"}", int(macro[2])]
+
 
 
 # -- Options for HTML output -------------------------------------------------

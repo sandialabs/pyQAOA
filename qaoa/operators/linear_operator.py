@@ -1,19 +1,6 @@
-from qaoa.util.types import is_squarematrix, is_callable
-import abc
+import qaoa
 
-class OperatorDocumentation(type):
-    """
-    Provides automatic inheritance of docstrings for methods not overridden by derived classes  
-    """
-
-    def __new__(metaclass, classname, bases, classdict):
-        cls = super().__new__(metaclass, classname, bases, classdict)
-        for k,v in classdict.items():
-            if not getattr(v,'__doc__') and v in dir(super()):
-                v.__doc__ = getattr(bases[-1],k).__doc__
-        return cls
-
-class LinearOperator(object,metaclass=OperatorDocumentation):
+class LinearOperator(object,metaclass=qaoa.util.DocumentationInheritance):
     """
     Defines the interface of generic linear operators that can be applied to vectors
 
@@ -29,6 +16,8 @@ class LinearOperator(object,metaclass=OperatorDocumentation):
     dtype : type
         Data type associated with the operator
     """
+
+    import abc
 
     def __init__(self,nq,dtype=float):
         """
@@ -145,8 +134,8 @@ class LinearOperator(object,metaclass=OperatorDocumentation):
         >>> M = numpy.zeros((n,n))
         >>> [ A.apply(e,M[:,k]) for k,e in enumerate(I) ] 
 
-        Note
-        ----
+        Important
+        ---------
         This method is for testing and validation purposes only as the cost of forming the operator
         as a matrix is computationally expensive and unnecessary for simulation. 
         

@@ -1,4 +1,3 @@
-from .linear_operator import OperatorDocumentation
 from .linear_operator import LinearOperator
 from .hermitian_operator import HermitianOperator
 from .unitary_operator import UnitaryOperator

@@ -1,15 +1,16 @@
-from qaoa.operators import LinearOperator, OperatorDocumentation
-from qaoa.util.math import inner_product, conj_inner_product
+from qaoa.operators import LinearOperator
+from qaoa.util import DocumentationInheritance
 import numpy as np
-import abc
 
-class HermitianOperator(LinearOperator):
+class HermitianOperator(LinearOperator,metaclass=DocumentationInheritance):
 
     """
     Defines the interface of generic Hermitian operators and provides infrastructure used by 
     derived types
 
     """
+
+    import abc
 
     def __str__(self):
         return "HermitianOperator"

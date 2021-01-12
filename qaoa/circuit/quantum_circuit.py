@@ -21,7 +21,7 @@ class QuantumCircuit(object):
     def __init__(self,ops,H,psi0=None):
 
         from qaoa.operators import HermitianOperator  
-        from qaoa.circuit import InitialStage, UnitaryStage, TargetStage, link_stages
+        from qaoa.circuit import CircuitStage, InitialStage, UnitaryStage, TargetStage
 
         self.num_stages = len(ops)
         self.A = [A for A in ops]
@@ -65,7 +65,7 @@ class QuantumCircuit(object):
          for k,A in enumerate(self.A[:-1])]
 
         self.stage.append(TargetStage(self.A[-1]))#,lam=self.work[:,-2],dlam=self.work[:,-3]))
-        link_stages(*self.stage)
+        CircuitStage.link(*self.stage)
 
     def __len__(self):
         return self.num_stages

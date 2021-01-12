@@ -1,6 +1,7 @@
 from qaoa.operators import HermitianOperator
 from qaoa.util.math import hadamard_mult, hadamard_div, hadamard_conj_mult, hadamard_conj_div
 from numba import njit, prange
+import numpy as np
 
 @njit(parallel=True)
 def diag_inner_product(u,d,v):
