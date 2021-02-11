@@ -37,7 +37,8 @@ class SineInterp(object):
         self.theta = np.array([ (np.pi/2)*(np.array(k)+1)/(self.ni+1) for k in \
                                 itertools.product(range(ni),repeat=self.dim) ])
         self.F = self.to_ncube(np.array([obj.value(theta) for theta in self.theta]))
-        self.Fhat = scipy.fft.idstn(self.F,type=1)
+        from scipy.fft import idstn
+        self.Fhat = idstn(self.F,type=1)
 
     
 
@@ -107,7 +108,8 @@ class SineInterp(object):
         """
         Fh = np.zeros([ne]*self.dim)
         Fh[(slice(self.ni),)*self.dim] = self.Fhat
-        values = scipy.fft.dstn(Fh,type=1)
+        from scipy.fft import dstn
+        values = dstn(Fh,type=1)
         return values
 
     @staticmethod

@@ -1,4 +1,3 @@
-import qaoa
 import numpy
 import networkx
 import numbers
