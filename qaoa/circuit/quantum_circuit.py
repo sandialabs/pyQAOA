@@ -23,6 +23,11 @@ class QuantumCircuit(object):
         from qaoa.operators import HermitianOperator  
         from qaoa.circuit import CircuitStage, InitialStage, UnitaryStage, TargetStage
 
+        self.count = { 'value'    : 0, \
+                       'gradient' : 0, \
+                       'hess_vec' : 0, \
+                       'hessian'  : 0 }
+
         self.num_stages = len(ops)
         self.A = [A for A in ops]
         self.A.append(H)
@@ -67,8 +72,30 @@ class QuantumCircuit(object):
         self.stage.append(TargetStage(self.A[-1]))#,lam=self.work[:,-2],dlam=self.work[:,-3]))
         CircuitStage.link(*self.stage)
 
+
     def __len__(self):
         return self.num_stages
+
+    def __deepcopy__(self,memo):
+        from copy import deepcopy
+        import numpy
+        Acopy = list()
+        shallow = [ np.where([y is x for x in self.A])[0] for y in self.A ]        
+        for k, A in enumerate(self.A):
+            k0 = shallow[k][0]
+            if k0 == k:
+                Acopy.append(deepcopy(A,memo))
+            else:
+                Acopy.append(Acopy[k0])  
+        qc_copy = QuantumCircuit(Acopy[:-1],Acopy[-1],numpy.copy(self.psi0))
+        qc_copy.set_control(self.get_control())
+        qc_copy.set_differential_control(self.get_differential_control())
+        return qc_copy
+
+
+    def reset_count(self):
+        for key in self.count.keys():
+            self.count[key] = 0
 
     def true_minimum(self):
         """
@@ -97,11 +124,17 @@ class QuantumCircuit(object):
         [ self.stage[k+1].set_differential_control(dtheta[k]) \
           for k in range(self.num_stages) ]
 
+    def get_control(self):
+        return np.array([ stage.theta for stage in self.stage[1:-1]])
+
+    def get_differential_control(self):
+        return np.array([ stage.dtheta for stage in self.stage[1:-1]])
 
     def value(self,theta):
         """
         Compute the objective function at a point theta
         """
+        self.count["value"] += 1
         self.set_control(theta)
         return self.A[-1].expectation(self.stage[-2].psi())
 
@@ -109,15 +142,23 @@ class QuantumCircuit(object):
         """
         Compute the gradient of the objective function at a point theta
         """
+        self.count["gradient"] += 1
         self.set_control(theta)
         return np.array([self.stage[k+1].deriv_1() \
                          for k in range(self.num_stages)])
 
-    def hessVec(self,theta,dtheta):
+    def gradient_norm(self,theta):
+        """
+        Compute the norm of the gradient of the objective function at a point theta
+        """
+        return np.linalg.norm(self.gradient(theta))
+
+    def hess_vec(self,theta,dtheta):
         """
         Compute the action of the Hessian matrix evaluated at 
         a point theta on a direction vector dtheta
         """
+        self.count["hess_vec"] += 1
         self.set_control(theta)
         self.set_differential_control(dtheta)
         return np.array([self.stage[k+1].deriv_2() \
@@ -127,9 +168,16 @@ class QuantumCircuit(object):
         """
         Evaluate the Hessian matri at a point theta
         """
+        self.count["hessian"] += 1
         self.set_control(theta)
         I = np.eye(self.num_stages)
-        return np.array([self.hessVec(theta,e) for e in I])
+        return np.array([self.hess_vec(theta,e) for e in I])
+
+    def hess_eig(self,theta):
+        """
+        Compute the eigenvalues of the Hessian at the point theta
+        """
+        return np.linalg.eig(self.hessian(theta))[0]
 
     def check_gradient(self,theta,delta=1e-4,v=None):
         """
@@ -150,7 +198,7 @@ class QuantumCircuit(object):
 
         return np.array(error) if isinstance(error,list) else error
 
-    def check_hessVec(self,theta,delta=1e-4,v=None):
+    def check_hess_vec(self,theta,delta=1e-4,v=None):
         """
         Compute the error of the Hessian-Vector product using a first-oeder finite difference approximation
         """   
@@ -158,7 +206,7 @@ class QuantumCircuit(object):
             v = np.random.rand(self.num_stages) * np.pi
 
         g0 = self.gradient(theta)
-        Hv = self.hessVec(theta,v)
+        Hv = self.hess_vec(theta,v)
 
         if hasattr(delta,'__iter__'):
             error = list()

@@ -25,6 +25,9 @@ class ProjectionOperator(HermitianOperator):
         nq = int(np.log2(len(self.v)))
         super().__init__(nq)
 
+    def __deepcopy__(self,memo):
+        return ProjectionOperator(np.copy(self.v))
+
     def inner_product(self,x,y):
         return inner_product(x,self.v) * inner_product(self.v,y)
 

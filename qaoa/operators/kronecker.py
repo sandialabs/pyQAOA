@@ -14,6 +14,9 @@ class Kronecker(LinearOperator):
         self.dtype = dtype
         self.work = np.zeros(1<<nq,dtype=self.dtype)
 
+    def __deepcopy__(self,memo):
+        return Kronecker(deepcopy(self.K,memo),self.nq,self.dtype)
+
     def compute(self,f,v,u):
         if self.nq % 2: # Odd number of stages
             f(0,v,u)

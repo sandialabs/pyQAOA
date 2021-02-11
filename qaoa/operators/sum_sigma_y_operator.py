@@ -41,6 +41,9 @@ class SumSigmaYOperator(HermitianOperator):
     def __init__(self,nq):
         super().__init__(nq)
 
+    def __deepcopy__(self,memo):
+        return SumSigmaYOperator(self.nq)
+
     def __str__(self):
         return "SumSigmaYOperator"
 

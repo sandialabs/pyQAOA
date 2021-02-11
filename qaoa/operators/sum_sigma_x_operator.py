@@ -45,6 +45,9 @@ class SumSigmaXOperator(HermitianOperator):
     def __str__(self):
         return "SumSigmaXOperator"
 
+    def __deepcopy__(self,memo):
+        return SumSigmaXOperator(self.nq) 
+
     def inner_product(self,u,v):
         return sum_sigma_x_inner_product(self.nq,u,v)
 

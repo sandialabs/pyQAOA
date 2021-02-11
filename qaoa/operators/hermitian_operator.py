@@ -16,6 +16,11 @@ class HermitianOperator(LinearOperator,metaclass=DocumentationInheritance):
         return "HermitianOperator"
 
     @abc.abstractmethod
+    def __deepcopy__(self,memo):
+        raise NotImplementedError("{0} does not override __deepcopy__() method".format(str(self)))
+
+
+    @abc.abstractmethod
     def true_minimum(self):
         """
         Return the minimum eigenvalue of the Hermitian operator

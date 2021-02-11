@@ -39,6 +39,10 @@ class DiagonalOperator(HermitianOperator):
     def __str__(self):
         return "DiagonalOperator"
 
+    def __deepcopy__(self,memo):
+        import numpy 
+        return DiagonalOperator(numpy.copy(self.data))
+
     def true_maximum(self):
         import numpy
         return numpy.max(self.data)
