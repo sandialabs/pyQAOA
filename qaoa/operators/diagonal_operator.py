@@ -1,21 +1,6 @@
 from qaoa.operators import HermitianOperator
-from qaoa.util.math import hadamard_mult, hadamard_div, hadamard_conj_mult, hadamard_conj_div
-from numba import njit, prange
+from qaoa.util.math import hadamard_mult, hadamard_div, hadamard_conj_mult, hadamard_conj_div, diag_inner_product, diag_conj_inner_product
 import numpy as np
-
-@njit(parallel=True)
-def diag_inner_product(u,d,v):
-    result = 0
-    for k in prange(len(d)):
-        result += u[k] * d[k] * v[k]
-    return result
-
-@njit(parallel=True)
-def diag_conj_inner_product(u,d,v):
-    result = 0
-    for k in prange(len(u)):
-        result += np.conj(u[k]) * d[k] * v[k]
-    return result
 
 
 class DiagonalOperator(HermitianOperator):
@@ -38,6 +23,10 @@ class DiagonalOperator(HermitianOperator):
  
     def __str__(self):
         return "DiagonalOperator"
+
+    def __deepcopy__(self,memo):
+        import numpy 
+        return DiagonalOperator(numpy.copy(self.data))
 
     def true_maximum(self):
         import numpy
