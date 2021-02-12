@@ -1,74 +1,83 @@
 import numpy as np
 from numba import njit, prange
+from multiprocessing import current_process
 
-@njit(parallel=False)
+def mpnjit(*args,**kwargs):
+    """
+    Only apply Numba parallelism to a function if it is running on the main process (serial)
+    """
+    kwargs["parallel"] = current_process().name=="MainProcess"
+    return njit(*args,**kwargs)
+
+
+@mpnjit
 def additive_assign(x,y):
     for k in prange(len(x)):
         y[k] += x[k]
 
 
-@njit(parallel=False)
+@mpnjit
 def scale(alpha,v):
     for k in prange(len(v)):
         v[k] *= alpha
 
-@njit(parallel=False)
+@mpnjit
 def axpy(alpha,x,y):
     for k in prange(len(x)):
         y[k] += alpha*x[k]
 
-@njit(parallel=False)
+@mpnjit
 def aypx(alpha,x,y):
     for k in prange(len(x)):
         y[k] *= alpha
         y[k] += x[k]
 
-@njit(parallel=False)
+@mpnjit
 def inner_product(u,v):
     result = 0
     for k in prange(len(u)):
         result += u[k] * v[k]
     return result
 
-@njit(parallel=False)
+@mpnjit
 def conj_inner_product(u,v):
     result = 0
     for k in prange(len(u)):
         result += np.conj(u[k]) * v[k]
     return result
 
-@njit(parallel=False)
+@mpnjit
 def hadamard_mult(d,v,Dv):
     for j in prange(len(d)):
         Dv[j] = d[j]*v[j]
 
-@njit(parallel=False)
+@mpnjit
 def hadamard_div(d,v,Dv):
     for j in prange(len(d)):
         Dv[j] = v[j]/d[j]
 
-@njit(parallel=False)
+@mpnjit
 def hadamard_conj_mult(d,v,Dv):
     for j in prange(len(d)):
         Dv[j] = numpy.conj(d[j])*v[j]
 
-@njit(parallel=False)
+@mpnjit
 def hadamard_conj_div(d,v,Dv):
     for j in prange(len(d)):
         Dv[j] = v[j]/numpy.conj(d[j])
 
-@njit(parallel=False)
+@mpnjit
 def cexp_hadamard_mult(d,theta,v,Uv):
     for k in prange(len(d)):
         Uv[k] = np.exp(1j*theta*d[k])*v[k]
 
-@njit(parallel=False)
+@mpnjit
 def cexp_hadamard_div(d,theta,v,Uv):
     for k in prange(len(d)):
         Uv[k] = np.exp(-1j*theta*d[k])*v[k]
 
 
-@njit(parallel=False)
+@mpnjit
 def projection_1d(v,x,y):
     s = 0
     for j in prange(len(v)):
@@ -76,7 +85,7 @@ def projection_1d(v,x,y):
     for j in prange(len(v)):
         y[j] = s*v[j]
 
-@njit(parallel=False)
+@mpnjit
 def projection_exp_1d(alpha,v,x,y):
     s = 0
     N = len(v)
@@ -85,13 +94,13 @@ def projection_exp_1d(alpha,v,x,y):
     for j in prange(N):
         y[j] = x[j] - alpha*s*v[j]
 
-@njit(parallel=False)
+@mpnjit
 def negate_real(z):
     for k in prange(len(z)):
         zk = z[k]
         z[k] = -zk.real + 1j * zk.imag
 
-@njit(parallel=False)
+@mpnjit
 def apply_kron2( A, n, k, x, y ):
     ldim = 1<<k
     rdim = 1<<(n-k-1)
@@ -105,25 +114,25 @@ def apply_kron2( A, n, k, x, y ):
             j2 += 1
 
 
-@njit(parallel=False)
+@mpnjit
 def diag_inner_product(u,d,v):
     result = 0
     for k in prange(len(d)):
         result += u[k] * d[k] * v[k]
     return result
 
-@njit(parallel=False)
+@mpnjit
 def diag_conj_inner_product(u,d,v):
     result = 0
     for k in prange(len(u)):
         result += np.conj(u[k]) * d[k] * v[k]
     return result
 
-@njit()
+@njit
 def zspin(n,k,i):
     return 1 - 2 * ( (k>>(n-i-1)) & 1 )
 
-@njit(parallel=False)
+@mpnjit
 def ising_dense_h(h_v,c):
     N = len(c)
     n = len(h_v)
@@ -131,7 +140,7 @@ def ising_dense_h(h_v,c):
         for i,h in enumerate(h_v):
             c[k] += h * zspin(n,k,i)
 
-#@njit(parallel=False)
+#@mpnjit
 def ising_sparse_h(h_rv,c):
     N = len(c)
     n = int(np.log2(N))
@@ -140,7 +149,7 @@ def ising_sparse_h(h_rv,c):
         for i, h in h_rv:
             c[k] += h * zspin(n,k,i)
 
-@njit(parallel=False)
+@mpnjit
 def ising_dense_J(J,c):
     N = len(c)
     n = J.shape[0]
@@ -150,7 +159,7 @@ def ising_dense_J(J,c):
             for j in range(i+1,n):
                 c[k] += J[i,j] * zi * zspin(n,k,j)
 
-@njit(parallel=False)
+@mpnjit
 def ising_sparse_J(J_rc,c):
     N = len(c)
     n = int(np.log2(N))
@@ -158,7 +167,7 @@ def ising_sparse_J(J_rc,c):
         for i,j in J_rc:
             c[k] += zspin(n,k,i) * zspin(n,k,j)
 
-@njit(parallel=False)
+@mpnjit
 def ising_sparse_weighted_J(J_rcv,c):
     N = len(c)
     n = int(np.log2(N))
@@ -167,14 +176,14 @@ def ising_sparse_weighted_J(J_rcv,c):
             c[k] += J * zspin(n,k,i) * zspin(n,k,j)
 
 
-@njit(parallel=False)
+@mpnjit
 def sum_sigma_x_mult(n,v,Dv):
     for j in prange(1<<n):
         Dv[j] = 0
         for k in prange(n):
             Dv[j] += v[j^(1<<k)]
 
-@njit(parallel=False)
+@mpnjit
 def sum_sigma_x_inner_product(n,u,v):
     result = 0
     for j in prange(1<<n):
@@ -184,7 +193,7 @@ def sum_sigma_x_inner_product(n,u,v):
         result += u[j]*lresult
     return result
 
-@njit(parallel=False)
+@mpnjit
 def sum_sigma_x_conj_inner_product(n,u,v):
     result = 0
     for j in prange(1<<n):
@@ -194,7 +203,7 @@ def sum_sigma_x_conj_inner_product(n,u,v):
         result += np.conj(u[j])*lresult
     return result
 
-@njit(parallel=False)
+@mpnjit
 def sum_sigma_y_mult(n,v,Dv):
     for j in prange(1<<n):
         Dv[j] = 0
@@ -203,7 +212,7 @@ def sum_sigma_y_mult(n,v,Dv):
             s = 1j if j>k else -1j
             Dv[j] += s*v[k]
 
-@njit(parallel=False)
+@mpnjit
 def sum_sigma_y_inner_product(n,u,v):
     result = 0
     for j in prange(1<<n):
@@ -215,7 +224,7 @@ def sum_sigma_y_inner_product(n,u,v):
         result += u[j]*lresult
     return result
 
-@njit(parallel=False)
+@mpnjit
 def sum_sigma_y_conj_inner_product(n,u,v):
     result = 0
     for j in prange(1<<n):
