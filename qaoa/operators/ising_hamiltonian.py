@@ -129,8 +129,6 @@ class IsingHamiltonian(DiagonalOperator):
             self.c = np.zeros(1<<self.nq)
 
         J = graph_edges(G)
-        for e in J:
-            print(e) 
         JL = List()
         [JL.append(e) for e in J]
         if is_weighted(G):

@@ -20,6 +20,8 @@ class DiagonalOperator(HermitianOperator):
         self.nq = int(numpy.log2(self.length))
         self.dtype = d.dtype
 #        super().__init__(int(numpy.log2(len(d))),dtype=d.dtype)
+        self.true_max = numpy.max(self.data)
+        self.true_min = numpy.min(self.data)
  
     def __str__(self):
         return "DiagonalOperator"
@@ -29,12 +31,24 @@ class DiagonalOperator(HermitianOperator):
         return DiagonalOperator(numpy.copy(self.data))
 
     def true_maximum(self):
-        import numpy
-        return numpy.max(self.data)
+        return self.true_max
 
     def true_minimum(self):
-        import numpy
-        return numpy.min(self.data)
+        return self.true_min
+
+    def max_state(self):
+        """
+        Returns a list of indices of canonical vectors that maximize the 
+        expectation value
+        """
+        return [k for k,val in enumerate(self.data) if val==self.true_max]
+
+    def min_state(self):
+        """
+        Returns a list of indices of canonical vectors that minimize the 
+        expectation value
+        """
+        return [k for k,val in enumerate(self.data) if val==self.true_min]
 
     def propagator(self,theta=0):
         from qaoa.operators import DiagonalPropagator

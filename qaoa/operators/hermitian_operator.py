@@ -42,6 +42,23 @@ class HermitianOperator(LinearOperator,metaclass=DocumentationInheritance):
         raise NotImplementedError("{0} does not override true_maximum() method".format(str(self)))
 
     @abc.abstractmethod
+    def min_state(self):
+        """
+        Return the state or states that minimize the expectation of this
+        operator
+        """   
+        raise NotImplementedError("{0} does not override min_state() method".format(str(self)))
+
+    @abc.abstractmethod
+    def max_state(self):
+        """
+        Return the state or states that maximize the expectation of this
+        operator
+        """   
+        raise NotImplementedError("{0} does not override max_state() method".format(str(self)))
+
+
+    @abc.abstractmethod
     def inner_product(self,u,v):
         """
         Compute the inner product of two vectors using the Hermitian operator
