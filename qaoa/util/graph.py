@@ -12,7 +12,7 @@ def is_weighted(G):
 def graph_edges(G):
 
     if is_graph(G):
-        G = [(u,v,G[u,v]) for u,v in G.edges] if is_weighted(G) else [(u,v) for u,v in G.edges]
+        G = [(u,v,G.edges[u,v]['weight']) for u,v in G.edges] if is_weighted(G) else [(u,v) for u,v in G.edges]
     return G
 
 def load(degree,nvert,graph_num=0):

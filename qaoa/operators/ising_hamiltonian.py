@@ -119,7 +119,8 @@ class IsingHamiltonian(DiagonalOperator):
         """
         from qaoa.util.graph import is_graph, graph_edges
         from numba.typed import List
-        from qaoa.util.math import ising_sparse_J, ising_dense_J
+        from qaoa.util.math import ising_sparse_J, ising_sparse_weighted_J, ising_dense_J
+        from networkx import is_weighted
 
         if self.nq is not None:
             assert(self.nq==len(G))
@@ -128,9 +129,14 @@ class IsingHamiltonian(DiagonalOperator):
             self.c = np.zeros(1<<self.nq)
 
         J = graph_edges(G)
+        for e in J:
+            print(e) 
         JL = List()
-        [JL.append(e) for e in J]        
-        ising_sparse_J(JL,self.c)
+        [JL.append(e) for e in J]
+        if is_weighted(G):
+            ising_sparse_weighted_J(JL, self.c) 
+        else:
+            ising_sparse_J(JL,self.c)
 
     def J_terms(self,J):
         """
