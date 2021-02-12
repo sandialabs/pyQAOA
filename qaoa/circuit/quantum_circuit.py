@@ -130,6 +130,9 @@ class QuantumCircuit(object):
     def get_differential_control(self):
         return np.array([ stage.dtheta for stage in self.stage[1:-1]])
 
+    def final_state(self,theta):
+        return self.stages[-1].psi()
+
     def value(self,theta):
         """
         Compute the objective function at a point theta
