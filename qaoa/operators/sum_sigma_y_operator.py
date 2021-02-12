@@ -1,40 +1,5 @@
 from qaoa.operators import HermitianOperator
-from numba import njit, prange
-
-@njit(parallel=True)
-def sum_sigma_y_mult(n,v,Dv):
-    for j in prange(1<<n):
-        Dv[j] = 0
-        for l in prange(n):
-            k = j ^ (1<<l)
-            s = 1j if j>k else -1j
-            Dv[j] += s*v[k]
-
-@njit(parallel=True)
-def sum_sigma_y_inner_product(n,u,v):
-    result = 0
-    for j in prange(1<<n):
-        lresult = 0
-        for l in prange(n):
-            k = j ^ (1<<l)
-            s = 1j if j>k else -1j
-            lresult += s*v[j^(1<<k)]
-        result += u[j]*lresult
-    return result
-
-@njit(parallel=True)
-def sum_sigma_y_conj_inner_product(n,u,v):
-    result = 0
-    for j in prange(1<<n):
-        lresult = 0
-        for l in prange(n):
-            k = j ^ (1<<l)
-            s = 1j if j>k else -1j
-            lresult += s*v[j^(1<<k)]
-        result += np.conj(u[j])*lresult
-    return result
-
-
+from qaoa.util.math import sum_sigma_y_mult, sum_sigma_y_inner_product, sum_sigma_y_conj_inner_product
 
 class SumSigmaYOperator(HermitianOperator):
 

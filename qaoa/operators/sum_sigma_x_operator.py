@@ -1,33 +1,5 @@
 from qaoa.operators import HermitianOperator
-from numba import njit, prange
-
-@njit(parallel=True)
-def sum_sigma_x_mult(n,v,Dv):
-    for j in prange(1<<n):
-        Dv[j] = 0
-        for k in prange(n):
-            Dv[j] += v[j^(1<<k)]
-
-@njit(parallel=True)
-def sum_sigma_x_inner_product(n,u,v):
-    result = 0
-    for j in prange(1<<n):
-        lresult = 0
-        for k in prange(n):
-            lresult += v[j^(1<<k)]
-        result += u[j]*lresult
-    return result
-
-@njit(parallel=True)
-def sum_sigma_x_conj_inner_product(n,u,v):
-    result = 0
-    for j in prange(1<<n):
-        lresult = 0
-        for k in prange(n):
-            lresult += v[j^(1<<k)]
-        result += np.conj(u[j])*lresult
-    return result
-
+from qaoa.util.math import sum_sigma_x_mult, sum_sigma_x_inner_product, sum_sigma_x_conj_inner_product
 
 class SumSigmaXOperator(HermitianOperator):
 
