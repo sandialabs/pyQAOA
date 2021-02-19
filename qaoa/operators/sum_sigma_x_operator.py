@@ -21,10 +21,10 @@ class SumSigmaXOperator(HermitianOperator):
         return SumSigmaXOperator(self.nq) 
 
     def inner_product(self,u,v):
-        return sum_sigma_x_inner_product(self.nq,u,v)
+        return sum_sigma_x_inner_product(self.num_qubits(),u,v)
 
     def conj_inner_product(self,u,v):
-        return sum_sigma_x_conj_inner_product(self.nq,u,v)
+        return sum_sigma_x_conj_inner_product(self.num_qubits(),u,v)
 
     def propagator(self,theta=0):
         from qaoa.operators import SumSigmaXPropagator
@@ -39,4 +39,4 @@ class SumSigmaXOperator(HermitianOperator):
         return D
     
     def apply(self,v,Dv):
-        sum_sigma_x_mult(self.nq,v,Dv)          
+        sum_sigma_x_mult(self.num_qubits(),v,Dv)          

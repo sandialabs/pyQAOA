@@ -61,3 +61,33 @@ class Propagator(UnitaryOperator):
         """
         from scipy.linalg import expm
         return expm(1j*self.theta*self.A.as_matrix())
+
+    def check_apply(self,v=None,tol=1e-8):
+        import numpy as np
+        if v is None:
+            v = np.random.randn(self.length) + \
+                1j*np.random.randn(self.length) 
+        else:
+            assert isinstance(v.dtype,complex)
+        Av = np.ndarray(self.length,dtype=complex)
+        self.apply(v,Av)
+        res = self.as_matrix() @ v - Av
+        rnorm = np.linalg.norm(res)
+        vnorm = np.linalg.norm(v)
+        return rnorm < tol * vnorm 
+
+    def finite_difference_check(self,delta=1e-4,v=None):
+        import numpy as np
+        if v is None:
+            v = np.random.randn(self.length) + \
+                1j*np.random.randn(self.length) 
+        Uv = np.ndarray(self.length,dtype=complex)
+        Av = np.ndarray(self.length,dtype=complex)
+        self.A.apply(v,Av)
+        theta_old = np.copy(self.theta)
+        self.set_control(delta)
+        self.apply(v,Uv)
+        residual = ( Av-(Uv-v)/(1j*delta) )
+        self.set_control(theta_old)
+        return np.linalg.norm(residual)
+

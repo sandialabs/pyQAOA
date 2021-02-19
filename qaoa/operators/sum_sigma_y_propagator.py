@@ -20,6 +20,9 @@ class SumSigmaYPropagator(Propagator):
     def apply(self,v,u):
         self.kronecker.apply(v,u)
 
+    def apply_adjoint(self,v,u):
+        self.kronecker.apply_adjoint(v,u)
+
     def as_matrix(self):
         return self.kronecker.as_matrix()
 

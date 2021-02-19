@@ -29,13 +29,15 @@ class ProjectionOperator(HermitianOperator):
         return ProjectionOperator(np.copy(self.v))
 
     def inner_product(self,x,y):
-        return inner_product(x,self.v) * inner_product(self.v,y)
+        return inner_product(self.num_qubits(),x,self.v) * \
+               inner_product(self.num_qubits(),self.v,y)
 
     def conj_inner_product(self,x,y):
-        return conj_inner_product(x,self.v) * conj_inner_product(self.v,y)
+        return conj_inner_product(self.num_qubits(),x,self.v) * \
+               conj_inner_product(self.num_qubits(),self.v,y)
 
     def expectation(self,x):
-        return np.abs(conj_inner_product(self.v,x))**2
+        return np.abs(conj_inner_product(self.num_qubits(),self.v,x))**2
 
     def propagator(self,theta=0):
         from qaoa.operators import ProjectionPropagator
@@ -45,7 +47,7 @@ class ProjectionOperator(HermitianOperator):
         return np.outer(self.conj(v),v)
        
     def apply(self,x,Px):
-        projection_1d(self.v,x,Px)
+        projection_1d(self.num_qubits(),self.v,x,Px)
 
     def apply_inverse(self,x,Px):
         raise NotImplementedError("Projection operators have no inverse")

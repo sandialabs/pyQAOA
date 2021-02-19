@@ -25,6 +25,6 @@ class SumSigmaYOperator(HermitianOperator):
         return D
 
     def apply(self,v,Dv):
-        sum_sigma_y_mult(self.nq,v,Dv)
+        sum_sigma_y_mult(self.num_qubits(),v,Dv)
 
 

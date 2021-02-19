@@ -96,12 +96,12 @@ class IsingHamiltonian(DiagonalOperator):
 
         from qaoa.util import types
         self.nq = None
-        self.c = None
+        self.data = None
         assert( (J is None) or (graph is None) )
 
         if nq is not None: 
             self.nq = nq
-            self.c =  np.zeros(1<<nq)
+            self.data =  np.zeros(1<<nq)
 
         if h is not None:
             self.h_terms(h)
@@ -112,7 +112,8 @@ class IsingHamiltonian(DiagonalOperator):
         if graph is not None:
             self.graph_terms(graph)
 
-        super().__init__(self.c)
+        super().__init__(self.data)
+
     def graph_terms(self,G):
         """
         Internally-used method used based on a graph edge set description 
@@ -122,19 +123,18 @@ class IsingHamiltonian(DiagonalOperator):
         from qaoa.util.math import ising_sparse_J, ising_sparse_weighted_J, ising_dense_J
         from networkx import is_weighted
 
-        if self.nq is not None:
-            assert(self.nq==len(G))
+        if self.num_qubits() is not None:
+            assert(self.num_qubits()==len(G))
         else:
-            self.nq = len(G)
-            self.c = np.zeros(1<<self.nq)
+            DiagonalOperator.__init__(self,np.zeros(1<<len(G)))
 
         J = graph_edges(G)
         JL = List()
         [JL.append(e) for e in J]
         if is_weighted(G):
-            ising_sparse_weighted_J(JL, self.c) 
+            ising_sparse_weighted_J(self.num_qubits(),JL, self.data) 
         else:
-            ising_sparse_J(JL,self.c)
+            ising_sparse_J(self.num_qubits(),JL,self.data)
 
     def J_terms(self,J):
         """
@@ -144,26 +144,25 @@ class IsingHamiltonian(DiagonalOperator):
         from qaoa.util.types import is_container, is_squarematrix
 
         if is_squarematrix(J):
-            if self.nq is not None:
-                assert(self.nq==J.shape[0])
+            if self.num_qubits() is not None:
+                assert(self.num_qubits()==J.shape[0])
             else:
-                self.nq = J.shape[0]
-                self.c = np.zeros(1<<self.nq)
+                DiagonalOperator.__init__(self,np.zeros(1<<self.nq))
 
             from qaoa.util.math import ising_dense_J
-            ising_dense_J(J,self.c)
+            ising_dense_J(self.num_qubits(),J,self.data)
 
         elif is_container(J):
-            assert(self.c is not None)
+            assert(self.data is not None)
             from numba.typed import List
             JL = List()
             [JL.append(e) for e in J]
-            if len(J[0]) == 2:
+            if len(J[0]) == 2: # Unweighted
                 from qaoa.util.math import ising_sparse_J
-                ising_sparse_J(JL,self.c)                      
-            else: 
+                ising_sparse_J(self.num_qubits(),JL,self.data)                      
+            else: # Weighted Edges
                 from qaoa.util.math import ising_sparse_weighted_J
-                ising_sparse_weighted_J(JL,self.c)                      
+                ising_sparse_weighted_J(self.num_qubits(),JL,self.data)                      
         else:
             raise TypeError("Argument of type {0} is unsupported".format(type(J))) 
 
@@ -176,20 +175,20 @@ class IsingHamiltonian(DiagonalOperator):
         from qaoa.util.types import is_container, is_nparray
 
         if is_nparray(h):
-            if self.nq is not None:
-                assert(self.nq==len(h))
+            if self.num_qubits() is not None:
+                assert(self.num_qubits()==len(h))
             else:
-                self.nq = len(h)
-            if self.c is None:
-                self.c = np.zeros(1<<self.nq)
-            ising_dense_h(h,self.c)
+                self.num_qubits() == len(h)
+            if self.data is None:
+                DiagonalOperator.__init__(self,np.zeros(1<<self.nq))
+            ising_dense_h(self.num_qubits(),h,self.data)
 
         elif is_container(h):
-            assert(self.c is not None)
+            assert(self.data is not None)
             from numba.typed import List
             hL = List()
             [hL.append(e) for e in h]
-            ising_sparse_h(hL,self.c)
+            ising_sparse_h(self.num_qubits(),hL,self.data)
    
         else:
             raise TypeError("Argument of type {0} is unsupported".format(type(h))) 

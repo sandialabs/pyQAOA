@@ -56,6 +56,7 @@ class LinearOperator(object,metaclass=qaoa.util.DocumentationInheritance):
         length : unsigned int
             The length of a vector that is an element of the domain or range space of this operator
         """
+        assert self.nq is not None
         return self.length
 
     @abc.abstractmethod

@@ -33,13 +33,13 @@ class QuantumCircuit(object):
         self.A.append(H)
 
         # Require all operators to be Hermitian
-        assert( all( isinstance(A,HermitianOperator) for A in self.A ) )
+        assert all( isinstance(A,HermitianOperator) for A in self.A ) 
 
         # Ensure each stage has the same number of qubits
         nqs = [A.num_qubits() for A in self.A]
         self.num_qubits = nqs[0]
  
-        assert( nqs.count(self.num_qubits) == self.num_stages+1 )
+        assert nqs.count(self.num_qubits) == self.num_stages+1 
 
         # Allocate workspace vectors
         #  
@@ -54,8 +54,6 @@ class QuantumCircuit(object):
 
         self.psi0 = self.work[:,-1]
 
-#        [A.work.__eq__(self.work[:,-2]) for A in self.A]
-
         self.psi0[:] = np.ones(N,dtype=complex)/np.sqrt(N) if psi0 is None else psi0
 
         self.psi  = self.work[:,0:L:4]
@@ -67,9 +65,9 @@ class QuantumCircuit(object):
 
         [self.stage.append(UnitaryStage(A,  psi=self.psi[:,k],   lam=self.lam[:,k],   \
                                            dpsi=self.dpsi[:,k], dlam=self.dlam[:,k])) \
-         for k,A in enumerate(self.A[:-1])]
+        for k,A in enumerate(self.A[:-1])]
 
-        self.stage.append(TargetStage(self.A[-1]))#,lam=self.work[:,-2],dlam=self.work[:,-3]))
+        self.stage.append(TargetStage(self.A[-1]))
         CircuitStage.link(*self.stage)
 
 
@@ -235,7 +233,6 @@ class QuantumCircuit(object):
         Compute the error of the state sensitivity using a first-order 
         finite difference approximation
         """
-
         if v is None:
             v = np.random.rand(self.num_stages) * np.pi
 
@@ -249,11 +246,13 @@ class QuantumCircuit(object):
             for h in delta:
                 self.set_control(theta+h*v)
                 self.stage[-2].psi()
-                error.append(np.max(np.abs(self.dpsi-(self.psi-psi_0)/h)))
+                fd_dpsi = (self.psi-psi_0)/h
+                error.append(np.max(np.abs(self.dpsi-fd_dpsi)))
         else:
            self.set_control(theta+delta*v)
            self.stage[-2].psi()
-           error = np.max(np.abs(self.dpsi-(self.psi-psi_0)/delta))
+           fd_dpsi = (self.psi-psi_0)/delta
+           error = np.max(np.abs(self.dpsi-fd_dpsi))
  
         self.set_control(theta)
         return np.array(error) if isinstance(error,list) else error

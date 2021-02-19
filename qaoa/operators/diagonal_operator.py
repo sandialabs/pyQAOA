@@ -55,23 +55,23 @@ class DiagonalOperator(HermitianOperator):
         return DiagonalPropagator(self,theta)
 
     def inner_product(self,u,v):
-        return diag_inner_product(u,self.data,v)
+        return diag_inner_product(self.num_qubits(),u,self.data,v)
 
     def conj_inner_product(self,u,v):
-        return diag_conj_inner_product(u,self.data,v)
+        return diag_conj_inner_product(self.num_qubits(),u,self.data,v)
 
     def as_matrix(self):
         import numpy 
         return numpy.diag(self.data)
        
     def apply(self,v,Dv):
-        hadamard_mult(self.data,v,Dv)   
+        hadamard_mult(self.num_qubits(),self.data,v,Dv)   
 
     def apply_inverse(self,v,Dv):
-        hadamard_div(self.data,v,Dv)   
+        hadamard_div(self.num_qubits(),self.data,v,Dv)   
 
     def apply_adjoint(self,v,Dv):
-        hadamard_conj_mult(self.data,v,Dv)   
+        hadamard_conj_mult(self.num_qubits(),self.data,v,Dv)   
 
     def apply_adjoint_inverse(self,v,Dv):
-        hadamard_conj_div(self.data,v,Dv)   
+        hadamard_conj_div(self.num_qubits(),self.data,v,Dv)   

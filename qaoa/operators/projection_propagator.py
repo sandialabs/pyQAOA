@@ -9,11 +9,12 @@ class ProjectionPropagator(Propagator):
         
         assert( isinstance(P,ProjectionOperator) )
         super().__init__(P,theta)
-        self.alpha = np.exp(1j*self.theta)
 
     def set_control(self,theta):
         self.theta = theta
-        self.alpha = np.exp(1j*self.theta)
 
     def apply(self,x,y):
-        projection_exp_1d(self.alpha,self.get_operator().v,x,y)
+        projection_exp_1d(np.exp(1j*self.theta),self.get_operator().v,x,y)
+
+    def apply_adjoint(self,x,y):
+        projection_exp_1d(np.exp(-1j*self.theta),self.get_operator().v,x,y)
