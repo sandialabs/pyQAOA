@@ -10,8 +10,8 @@ class QuantumCircuit(object):
     ----------
 
     A : list 
-        A list of Hermitian operators. One for every UnitaryStage in the circuit and an additional for
-        the TargetStage
+        A list of Hermitian operators. One for every UnitaryStage in the circuit and an 
+        additional for the TargetStage.
     num_stages : unsigned int
         The number of UnitaryStages 
     num_qubits : unsigned int
@@ -44,13 +44,11 @@ class QuantumCircuit(object):
         # Allocate workspace vectors
         #  
         # 1 vector for psi0
-        # 1 vector to be shared by Propagators
         # 4 vectors per UnitaryStage (psi,lam,dpsi,dlam)
-        # 2 vectors for TargetStage (lam,dlam)
 
         N = 1 << self.num_qubits
         L = 4*self.num_stages
-        self.work = np.zeros((N,L+4),dtype=complex)
+        self.work = np.zeros((N,L+1),dtype=complex)
 
         self.psi0 = self.work[:,-1]
 
@@ -179,108 +177,3 @@ class QuantumCircuit(object):
         Compute the eigenvalues of the Hessian at the point theta
         """
         return np.linalg.eig(self.hessian(theta))[0]
-
-    def check_gradient(self,theta,delta=1e-4,v=None):
-        """
-        Compute the error of the gradient with a first-order finite difference approximation
-        """
-        if v is None:
-            v = np.random.rand(self.num_stages) * np.pi
-
-        f0 = self.value(theta)
-        g = self.gradient(theta)
-        df = np.dot(g,v)
-        if hasattr(delta,'__iter__'):
-            error = list()
-            for h in delta:
-                error.append(np.abs(df-(self.value(theta+h*v)-f0)/h))
-        else:
-            error = np.abs(df - (self.value(theta+delta*v)-f0)/delta)
-
-        return np.array(error) if isinstance(error,list) else error
-
-    def check_hess_vec(self,theta,delta=1e-4,v=None):
-        """
-        Compute the error of the Hessian-Vector product using a first-oeder finite difference approximation
-        """   
-        if v is None:
-            v = np.random.rand(self.num_stages) * np.pi
-
-        g0 = self.gradient(theta)
-        Hv = self.hess_vec(theta,v)
-
-        if hasattr(delta,'__iter__'):
-            error = list()
-            for h in delta:
-                error.append(np.linalg.norm(Hv-(self.gradient(theta+h*v)-g0)/h))
-        else:
-            error = np.linalg.norm(Hv-(self.gradient(theta+delta*v)-g0)/delta)
-
-        return np.array(error) if isinstance(error,list) else error
-
-    def compute_psi(self):
-        """ 
-        Returns the state for each stage. Use for testing purposes only as it is very inefficient
-        """ 
-        psi = np.zeros((1<<self.num_qubits,self.num_stages+1),dtype=complex)
-        psi[:,0] = self.psi0[:]
-        for k,s in enumerate(self.stage[1:-1]):
-            psi[:,k+1] = s.U.as_matrix() @ psi[:,k]
-        return psi[:,1:]
-   
-    def check_dpsi(self,theta,delta=1e-4,v=None):
-        """
-        Compute the error of the state sensitivity using a first-order 
-        finite difference approximation
-        """
-        if v is None:
-            v = np.random.rand(self.num_stages) * np.pi
-
-        self.set_control(theta)
-        self.set_differential_control(v)
-        self.stage[-2].psi()
-        self.stage[-2].dpsi()
-        psi_0 = np.copy(self.psi)
-        if hasattr(delta,"__iter__"):
-            error = list()
-            for h in delta:
-                self.set_control(theta+h*v)
-                self.stage[-2].psi()
-                fd_dpsi = (self.psi-psi_0)/h
-                error.append(np.max(np.abs(self.dpsi-fd_dpsi)))
-        else:
-           self.set_control(theta+delta*v)
-           self.stage[-2].psi()
-           fd_dpsi = (self.psi-psi_0)/delta
-           error = np.max(np.abs(self.dpsi-fd_dpsi))
- 
-        self.set_control(theta)
-        return np.array(error) if isinstance(error,list) else error
-
-    def check_dlam(self,theta,delta=1e-4,v=None):
-        """
-        Compute the error of the adjoint sensitivity using a first-order 
-        finite difference approximation
-        """
-
-        if v is None:
-            v = np.random.rand(self.num_stages) * np.pi
-
-        self.set_control(theta)
-        self.set_differential_control(v)
-        self.stage[1].lam()
-        self.stage[1].dlam()
-        lam_0 = np.copy(self.lam)
-        if hasattr(delta,"__iter__"):
-            error = list()
-            for h in delta:
-                self.set_control(theta+h*v)
-                self.stage[1].lam()
-                error.append(np.max(np.abs(self.dlam-(self.lam-lam_0)/h)))
-        else:
-           self.set_control(theta+delta*v)
-           self.stage[1].lam()
-           error = np.max(np.abs(self.dlam-(self.lam-lam_0)/delta))
- 
-        self.set_control(theta)
-        return np.array(error) if isinstance(error,list) else error

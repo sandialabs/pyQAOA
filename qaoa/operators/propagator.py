@@ -76,18 +76,18 @@ class Propagator(UnitaryOperator):
         vnorm = np.linalg.norm(v)
         return rnorm < tol * vnorm 
 
-    def finite_difference_check(self,delta=1e-4,v=None):
-        import numpy as np
-        if v is None:
-            v = np.random.randn(self.length) + \
-                1j*np.random.randn(self.length) 
-        Uv = np.ndarray(self.length,dtype=complex)
-        Av = np.ndarray(self.length,dtype=complex)
-        self.A.apply(v,Av)
-        theta_old = np.copy(self.theta)
-        self.set_control(delta)
-        self.apply(v,Uv)
-        residual = ( Av-(Uv-v)/(1j*delta) )
-        self.set_control(theta_old)
-        return np.linalg.norm(residual)
+#    def finite_difference_check(self,delta=1e-4,v=None):
+#        import numpy as np
+#        if v is None:
+#            v = np.random.randn(self.length) + \
+#                1j*np.random.randn(self.length) 
+#        Uv = np.ndarray(self.length,dtype=complex)
+#        Av = np.ndarray(self.length,dtype=complex)
+#        self.A.apply(v,Av)
+#        theta_old = np.copy(self.theta)
+#        self.set_control(delta)
+#        self.apply(v,Uv)
+#        residual = ( Av-(Uv-v)/(1j*delta) )
+#        self.set_control(theta_old)
+#        return np.linalg.norm(residual)
 
