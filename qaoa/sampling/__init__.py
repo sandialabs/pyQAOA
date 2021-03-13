@@ -1,1 +1,1 @@
-from .objective_sampler import ObjectiveSampler
+from .qaoa_process import QAOAProcess, sample_QAOA

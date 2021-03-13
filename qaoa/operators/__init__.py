@@ -12,3 +12,4 @@ from .diagonal_propagator import DiagonalPropagator
 from .projection_propagator import ProjectionPropagator
 from .sum_sigma_x_propagator import SumSigmaXPropagator
 from .sum_sigma_y_propagator import SumSigmaYPropagator
+from .load_ising_hamiltonian import load_max_cut_hamiltonian

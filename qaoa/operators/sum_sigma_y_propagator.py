@@ -15,7 +15,7 @@ class SumSigmaYPropagator(Propagator):
         self.theta = theta
         c = np.cos(self.theta)
         s = 1j*np.sin(self.theta)
-        self.kronecker.K = np.array(((c,-s),(s,c)),dtype=complex)
+        self.kronecker.K = np.array(((c,s),(-s,c)),dtype=complex)
 
     def apply(self,v,u):
         self.kronecker.apply(v,u)

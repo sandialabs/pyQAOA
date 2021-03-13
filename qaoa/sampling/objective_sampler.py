@@ -1,4 +1,4 @@
-class ObjectiveSampler(object):
+lass ObjectiveSampler(object):
 
     @staticmethod
     def run(objlist,k,x,*opts):
@@ -23,7 +23,6 @@ class ObjectiveSampler(object):
         
         return results
 
-
     def __init__(self,obj,num_threads=None):
         from multiprocessing import cpu_count
         from copy import deepcopy
@@ -43,7 +42,10 @@ class ObjectiveSampler(object):
         sample = self.default_sample_dist if sample_dist is None else sample_dist
         num_threads = self.num_threads
         num_stages = self.num_stages
+        
         results = [ pool.apply_async( self.run, (self.obj,k%self.num_stages,sample(num_stages),*options) ) for k in range(num_samples) ]
+        
+
         return DataFrame([ res.get() for res in results ])
        
 

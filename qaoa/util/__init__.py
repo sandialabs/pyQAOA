@@ -5,3 +5,4 @@ from .doc_inherit import DocumentationInheritance
 from .sine_interp import SineInterp
 from . import finite_difference
 from . import number_format
+from .queue_logger import QueueLogger
